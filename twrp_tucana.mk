@@ -1,5 +1,5 @@
-# Наследуем базовые настройки
-$(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base.mk)
+# Правильное наследование базы TWRP/OrangeFox
+$(call inherit-product, vendor/twrp/config/common.mk)
 
 # Имя продукта и модель
 PRODUCT_NAME := twrp_tucana
