@@ -1,0 +1,42 @@
+name: Build OrangeFox R14 Tucana
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Recovery
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Очистка места на сервере
+      uses: rokibhasansagar/slimhub_actions@main
+
+    - name: Установка программ для сборки
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git-core gnupg flex bison build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python2
+        sudo ln -sf /usr/bin/python2 /usr/bin/python
+
+    - name: Скачивание исходников OrangeFox (fox_12.1)
+      run: |
+        mkdir ~/fox
+        cd ~/fox
+        git clone https://gitlab.com/OrangeFox/sync.git
+        cd sync
+        ./orangefox_sync.sh --branch 12.1 --path ~/fox
+
+    - name: Скачивание наших файлов (Дерево устройства)
+      run: |
+        cd ~/fox
+        git clone https://github.com/LIECOTI/tucana-orangefox.git -b main device/xiaomi/tucana
+
+    - name: Сборка OrangeFox
+      run: |
+        cd ~/fox
+        /bin/bash -c "source build/envsetup.sh && export ALLOW_MISSING_DEPENDENCIES=true && export LC_ALL=\"C\" && lunch twrp_tucana-eng && mka adbd recoveryimage"
+
+    - name: Загрузка готового ZIP-файла
+      uses: actions/upload-artifact@v3
+      with:
+        name: OrangeFox-Tucana-Retrofit
+        path: ~/fox/out/target/product/tucana/OrangeFox*.zip
