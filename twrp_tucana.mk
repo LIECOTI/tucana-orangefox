@@ -1,5 +1,6 @@
-# Правильное наследование базы TWRP/OrangeFox
-$(call inherit-product, vendor/twrp/config/common.mk)
+# Наследуем базовые настройки Android 64-bit
+$(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
+$(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base.mk)
 
 # Имя продукта и модель
 PRODUCT_NAME := twrp_tucana
