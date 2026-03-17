@@ -11,11 +11,19 @@ jobs:
     - name: Очистка места на сервере
       uses: rokibhasansagar/slimhub_actions@main
 
-    - name: Установка программ для сборки
+    - name: Установка программ для сборки и REPO
       run: |
         sudo apt-get update
         sudo apt-get install -y git-core gnupg flex bison build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python2
         sudo ln -sf /usr/bin/python2 /usr/bin/python
+        
+        # Устанавливаем команду repo
+        sudo curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo
+        sudo chmod a+x /usr/local/bin/repo
+        
+        # Настраиваем Git
+        git config --global user.name "LIECOTI"
+        git config --global user.email "liecoti@github.com"
 
     - name: Скачивание исходников OrangeFox (fox_12.1)
       run: |
