@@ -37,11 +37,15 @@ jobs:
       run: |
         cd ~/fox
         git clone https://github.com/LIECOTI/tucana-orangefox.git -b main device/xiaomi/tucana
-
+  
     - name: Сборка OrangeFox
       run: |
         cd ~/fox
-        /bin/bash -c "source build/envsetup.sh && export ALLOW_MISSING_DEPENDENCIES=true && export LC_ALL=\"C\" && lunch twrp_tucana-eng && mka adbd recoveryimage"
+        source build/envsetup.sh
+        export ALLOW_MISSING_DEPENDENCIES=true
+        export LC_ALL="C"
+        lunch twrp_tucana-eng
+        mka adbd recoveryimage
 
     - name: Загрузка готового ZIP-файла
       uses: actions/upload-artifact@v4
