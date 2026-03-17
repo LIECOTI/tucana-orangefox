@@ -1,7 +1,7 @@
-# Наследуем базовые настройки Android
+# Наследуем базовые настройки
 $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base.mk)
 
-# Паспортные данные телефона
+# Имя продукта и модель
 PRODUCT_NAME := twrp_tucana
 PRODUCT_DEVICE := tucana
 PRODUCT_BRAND := Xiaomi
