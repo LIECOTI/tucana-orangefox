@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     name: Build Recovery
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Очистка места на сервере
       uses: rokibhasansagar/slimhub_actions@main
