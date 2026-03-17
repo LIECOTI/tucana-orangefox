@@ -36,7 +36,7 @@ jobs:
         /bin/bash -c "source build/envsetup.sh && export ALLOW_MISSING_DEPENDENCIES=true && export LC_ALL=\"C\" && lunch twrp_tucana-eng && mka adbd recoveryimage"
 
     - name: Загрузка готового ZIP-файла
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: OrangeFox-Tucana-Retrofit
         path: ~/fox/out/target/product/tucana/OrangeFox*.zip
