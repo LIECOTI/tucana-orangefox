@@ -22,17 +22,29 @@ TARGET_BOOTLOADER_BOARD_NAME := sm7150
 TARGET_NO_BOOTLOADER := true
 
 # --- НАСТРОЙКИ ЯДРА (Kernel) ---
+# --- НАСТРОЙКИ ЯДРА (Kernel) ---
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/kernel
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/recovery_dtbo.img
 BOARD_INCLUDE_RECOVERY_DTBO := true
-BOARD_KERNEL_CMDLINE := console=ttyMSM0,115200n8 earlycon=msm_geni_serial,0xA90000 androidboot.hardware=qcom androidboot.console=ttyMSM0 androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=2048 loop.max_part=7 androidboot.usbcontroller=a600000.dwc3 buildvariant=user
+
+# Идеальные адреса памяти (из твоего дампа)
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_PAGESIZE := 4096
+BOARD_KERNEL_OFFSET := 0x00008000
 BOARD_RAMDISK_OFFSET := 0x01000000
 BOARD_KERNEL_TAGS_OFFSET := 0x00000100
+
+# Оригинальный cmdline (с permissive и драйверами)
+BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=1 androidboot.usbcontroller=a600000.dwc3 firmware_class.path=/vendor/firmware_mnt/image loop.max_part=7 cgroup.memory=nokmem,nosocket androidboot.usbconfigfs=true androidboot.selinux=permissive buildvariant=eng
+
+# Аргументы для сборщика mkbootimg
+BOARD_MKBOOTIMG_ARGS += --header_version 1
+BOARD_MKBOOTIMG_ARGS += --kernel_offset $(BOARD_KERNEL_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
-BOARD_MKBOOTIMG_ARGS += --header_version 1
+
+# Хак для Snapdragon: принудительно "передернуть" экран при загрузке (спасает от черного экрана)
+TARGET_RECOVERY_UI_BLANK_UNBLANK_ON_INIT := true
 
 # --- РАЗМЕРЫ РАЗДЕЛОВ (Tucana) ---
 BOARD_FLASH_BLOCK_SIZE := 262144
