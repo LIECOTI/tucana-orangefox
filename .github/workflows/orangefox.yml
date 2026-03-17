@@ -41,10 +41,19 @@ jobs:
     - name: Сборка OrangeFox
       run: |
         cd ~/fox
+        # Включаем трансляцию всех действий (Режим Бога)
+        set -x
+        # Отключаем режим "Паники" при ошибках
+        set +e
+        
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         export LC_ALL="C"
+        
+        # Пытаемся выбрать телефон. Если будет ошибка - мы ее увидим!
         lunch twrp_tucana-eng
+        
+        # Запускаем сборку
         mka adbd recoveryimage
 
     - name: Загрузка готового ZIP-файла
