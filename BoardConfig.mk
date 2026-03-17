@@ -22,7 +22,6 @@ TARGET_BOOTLOADER_BOARD_NAME := sm7150
 TARGET_NO_BOOTLOADER := true
 
 # --- НАСТРОЙКИ ЯДРА (Kernel) ---
-# --- НАСТРОЙКИ ЯДРА (Kernel) ---
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/kernel
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/recovery_dtbo.img
 BOARD_INCLUDE_RECOVERY_DTBO := true
