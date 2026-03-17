@@ -23,6 +23,3 @@ export OF_SCREEN_W=1080
 # Дополнительные утилиты
 export FOX_ENABLE_APP_MANAGER=1
 export OF_ENABLE_LPTOOLS=1
-
-# Принудительно добавляем устройство в меню сборки
-add_lunch_combo twrp_tucana-eng
