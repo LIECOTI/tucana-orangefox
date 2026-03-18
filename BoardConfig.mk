@@ -26,14 +26,14 @@ TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/kernel
 BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)/recovery_dtbo.img
 BOARD_INCLUDE_RECOVERY_DTBO := true
 
-# Идеальные адреса памяти (из твоего дампа)
+# адреса памяти 
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_KERNEL_OFFSET := 0x00008000
 BOARD_RAMDISK_OFFSET := 0x01000000
 BOARD_KERNEL_TAGS_OFFSET := 0x00000100
 
-# Оригинальный cmdline (с permissive и драйверами)
+# cmdline (с permissive и драйверами)
 BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=1 androidboot.usbcontroller=a600000.dwc3 firmware_class.path=/vendor/firmware_mnt/image loop.max_part=7 cgroup.memory=nokmem,nosocket androidboot.usbconfigfs=true androidboot.selinux=permissive buildvariant=eng
 
 # Аргументы для сборщика mkbootimg
@@ -42,7 +42,6 @@ BOARD_MKBOOTIMG_ARGS += --kernel_offset $(BOARD_KERNEL_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 
-# Хак для Snapdragon: принудительно "передернуть" экран при загрузке (спасает от черного экрана)
 TARGET_RECOVERY_UI_BLANK_UNBLANK_ON_INIT := true
 
 # --- РАЗМЕРЫ РАЗДЕЛОВ (Tucana) ---
@@ -50,7 +49,7 @@ BOARD_FLASH_BLOCK_SIZE := 262144
 BOARD_BOOTIMAGE_PARTITION_SIZE := 134217728
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 134217728
 
-# --- МАГИЯ RETROFIT DYNAMIC PARTITIONS ---
+# --- RETROFIT DYNAMIC PARTITIONS ---
 # Это объединит старые разделы в один большой super-раздел
 BOARD_RETROFIT_DYNAMIC_PARTITIONS := true
 BOARD_SUPER_PARTITION_SIZE := 9126805504
@@ -58,7 +57,7 @@ BOARD_SUPER_PARTITION_GROUPS := qti_dynamic_partitions
 BOARD_QTI_DYNAMIC_PARTITIONS_SIZE := 9122611200
 BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := system system_ext product vendor odm
 
-# --- ФИКС ОШИБКИ SYMLINK VENDOR (Указываем, что это реальные папки) ---
+# --- ФИКС  SYMLINK VENDOR ---
 TARGET_COPY_OUT_VENDOR := vendor
 TARGET_COPY_OUT_PRODUCT := product
 TARGET_COPY_OUT_SYSTEM_EXT := system_ext
@@ -77,18 +76,20 @@ TARGET_USERIMAGES_USE_F2FS := true
 # --- НАСТРОЙКИ ORANGEFOX / TWRP ---
 TW_THEME := portrait_hdpi
 RECOVERY_SDCARD_ON_DATA := true
-TARGET_RECOVERY_PIXEL_FORMAT := "BGRA_8888"
+TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
 TW_MAX_BRIGHTNESS := 1023
 TW_DEFAULT_BRIGHTNESS := 400
 TW_Y_OFFSET := 80
 TW_HAPTICS_TSPDRV := true
+TW_HAS_MTP := true
+TW_ALWAYS_RMR := true
 
-# --- FASTBOOTD (Жизненно важно для прошивки портов MIUI) ---
+# --- FASTBOOTD ---
 TW_INCLUDE_FASTBOOTD := true
 TW_INCLUDE_REPACKTOOLS := true
 
-# --- ШИФРОВАНИЕ (Поддержка расшифровки Android 12 - 15) ---
+# --- ШИФРОВАНИЕ ---
 TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
 TW_INCLUDE_FBE_METADATA_DECRYPT := true
