@@ -23,3 +23,14 @@ export OF_SCREEN_W=1080
 # Дополнительные утилиты
 export FOX_ENABLE_APP_MANAGER=1
 export OF_ENABLE_LPTOOLS=1
+
+# --- ФИКС ВЫРЕЗА ЭКРАНА (Капля) ---
+export OF_STATUS_H=95
+export OF_STATUS_INDENT_LEFT=48
+export OF_STATUS_INDENT_RIGHT=48
+export OF_CLOCK_POS=1
+
+# --- ФИКС ПЕРЕЗАГРУЗКИ ---
+export FOX_VANILLA_BUILD=1
+export OF_ENABLE_ALL_PARTITION_TOOLS=1
+export FOX_REPLACE_TOOLBOX_GETPROP=1
