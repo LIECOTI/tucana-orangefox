@@ -1,4 +1,4 @@
-# Наследуем базовые настройки Android 64-bit
+# базовые настройки Android 64-bit
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/aosp_base.mk)
 
