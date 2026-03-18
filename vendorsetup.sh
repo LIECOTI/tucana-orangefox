@@ -32,5 +32,4 @@ export OF_CLOCK_POS=1
 
 # --- ФИКС ПЕРЕЗАГРУЗКИ ---
 export FOX_VANILLA_BUILD=1
-export OF_ENABLE_ALL_PARTITION_TOOLS=1
 export FOX_REPLACE_TOOLBOX_GETPROP=1
