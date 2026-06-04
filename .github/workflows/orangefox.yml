@@ -1,4 +1,4 @@
-name: Build OrangeFox R14 Tucana
+name: Build OrangeFox R12 Tucana
 
 on:
   workflow_dispatch:
@@ -8,56 +8,48 @@ jobs:
     name: Build Recovery
     runs-on: ubuntu-22.04
     steps:
-    - name: Очистка места на сервере
+    - name: Clean disk space
       uses: rokibhasansagar/slimhub_actions@main
 
-    - name: Установка программ для сборки и REPO
+    - name: Install build dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y git-core gnupg flex bison build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python2
         sudo ln -sf /usr/bin/python2 /usr/bin/python
         
-        # Устанавливаем команду repo
         sudo curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo
         sudo chmod a+x /usr/local/bin/repo
         
-        # Настраиваем Git
         git config --global user.name "LIECOTI"
         git config --global user.email "liecoti@github.com"
 
-    - name: Скачивание исходников OrangeFox (fox_12.1)
+    - name: Sync OrangeFox sources
       run: |
-        mkdir ~/fox
-        cd ~/fox
+        mkdir ~/OrangeFox_sync
+        cd ~/OrangeFox_sync
         git clone https://gitlab.com/OrangeFox/sync.git
         cd sync
-        ./orangefox_sync.sh --branch 12.1 --path ~/fox
+        ./orangefox_sync.sh --branch 12.1 --path ~/fox_12.1
 
-    - name: Скачивание наших файлов (Дерево устройства)
+    - name: Clone device tree
       run: |
-        cd ~/fox
+        cd ~/fox_12.1
         git clone https://github.com/LIECOTI/tucana-orangefox.git -b main device/xiaomi/tucana
   
-    - name: Сборка OrangeFox
+    - name: Build OrangeFox
       run: |
-        cd ~/fox
-        # Включаем трансляцию всех действий (Режим Бога)
+        cd ~/fox_12.1
         set -x
-        # Отключаем режим "Паники" при ошибках
         set +e
-        
-        source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
+        export FOX_BUILD_DEVICE=tucana
         export LC_ALL="C"
-        
-        # Пытаемся выбрать телефон. Если будет ошибка - мы ее увидим!
+        source build/envsetup.sh
         lunch twrp_tucana-eng
-        
-        # Запускаем сборку
         mka adbd recoveryimage
 
-    - name: Загрузка готового ZIP-файла
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: OrangeFox-Tucana-Retrofit
-        path: ~/fox/out/target/product/tucana/OrangeFox*.zip
+        path: ~/fox_12.1/out/target/product/tucana/OrangeFox*.zip
