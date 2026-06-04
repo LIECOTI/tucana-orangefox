@@ -36,7 +36,7 @@ jobs:
         cd ~/fox_12.1
         git clone https://github.com/LIECOTI/tucana-orangefox.git -b main device/xiaomi/tucana
         cd device/xiaomi/tucana
-        curl -L -o dtbo.img "УКАЖИ_ЗДЕСЬ_ПРЯМУЮ_ССЫЛКУ_НА_DTBO"
+        curl -L -o dtbo.img "https://mirrors.dotsrc.org/lineageos/full/tucana/20260601/dtbo.img"
   
     - name: Build OrangeFox
       run: |
