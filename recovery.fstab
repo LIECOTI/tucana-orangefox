@@ -3,9 +3,7 @@
 # Logical partitions (Retrofit)
 system                                          /system      ext4    ro,barrier=1,discard     wait,logical,first_stage_mount
 vendor                                          /vendor      ext4    ro,barrier=1,discard     wait,logical,first_stage_mount
-product                                         /product     ext4    ro,barrier=1,discard     wait,logical,first_stage_mount
-system_ext                                      /system_ext  ext4    ro,barrier=1,discard     wait,logical,first_stage_mount
-odm                                             /odm         ext4    ro,barrier=1,discard     wait,logical,first_stage_mount
+cust                                            /cust        ext4    ro,barrier=1,discard     wait,logical,first_stage_mount
 
 # Physical partitions
 /dev/block/bootdevice/by-name/boot              /boot        emmc    defaults                 defaults
