@@ -30,10 +30,11 @@ BOARD_RAMDISK_OFFSET := 0x01000000
 BOARD_KERNEL_TAGS_OFFSET := 0x00000100
 BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom androidboot.memcg=1 lpm_levels.sleep_disabled=1 video=vfb:640x400,bpp=32,memsize=3072000 msm_rtb.filter=0x237 service_locator.enable=1 swiotlb=1 androidboot.usbcontroller=a600000.dwc3 androidboot.selinux=permissive buildvariant=eng
 
-BOARD_MKBOOTIMG_ARGS += --header_version 1
+BOARD_MKBOOTIMG_ARGS += --header_version 2
 BOARD_MKBOOTIMG_ARGS += --kernel_offset $(BOARD_KERNEL_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
+BOARD_RECOVERY_MKBOOTIMG_ARGS := --header_version 2
 TARGET_RECOVERY_UI_BLANK_UNBLANK_ON_INIT := true
 
 # Partitions sizes
