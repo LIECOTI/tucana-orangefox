@@ -31,10 +31,12 @@ jobs:
         cd sync
         ./orangefox_sync.sh --branch 12.1 --path ~/fox_12.1
 
-    - name: Clone device tree
+    - name: Clone device tree and download DTBO
       run: |
         cd ~/fox_12.1
         git clone https://github.com/LIECOTI/tucana-orangefox.git -b main device/xiaomi/tucana
+        cd device/xiaomi/tucana
+        curl -L -o dtbo.img "УКАЖИ_ЗДЕСЬ_ПРЯМУЮ_ССЫЛКУ_НА_DTBO"
   
     - name: Build OrangeFox
       run: |
@@ -44,6 +46,7 @@ jobs:
         export ALLOW_MISSING_DEPENDENCIES=true
         export FOX_BUILD_DEVICE=tucana
         export LC_ALL="C"
+        export OF_FORCE_PREBUILT_KERNEL=1
         source build/envsetup.sh
         lunch twrp_tucana-eng
         mka adbd recoveryimage
