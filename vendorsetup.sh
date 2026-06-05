@@ -21,7 +21,7 @@ export FOX_ENABLE_APP_MANAGER=1
 export OF_ENABLE_LPTOOLS=1
 
 # Screen notch/cutout configuration
-export OF_STATUS_H=85
+export OF_STATUS_H=60
 export OF_STATUS_INDENT_LEFT=64
 export OF_STATUS_INDENT_RIGHT=64
 export OF_CLOCK_POS=1
