@@ -1,2 +1,2 @@
 # tucana-orangefox
-OrangeFox R14 with retrofit for tucana 
+OrangeFox R12 with retrofit for tucana 
