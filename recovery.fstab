@@ -16,5 +16,3 @@ cust                                            /cust        ext4    ro,barrier=
 # Userdata with FBE v2 encryption
 /dev/block/bootdevice/by-name/userdata          /data        f2fs    nosuid,nodev,noatime     wait,check,formattable,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized+wrappedkey_v0,metadata_encryption=aes-256-xts:wrappedkey_v0,keydirectory=/metadata/vold/metadata_encryption
 
-# External storage (Стандартная строка монтирования Android)
-/devices/platform/soc/a600000.ssusb/a600000.dwc3/xhci-hcd.0.auto* /storage/usbotg    vfat    nosuid,nodev    wait,voldmanaged=usbotg:auto
