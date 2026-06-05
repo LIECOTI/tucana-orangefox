@@ -78,7 +78,6 @@ TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 TW_BRIGHTNESS_PATH := "/sys/class/backlight/panel0-backlight/brightness"
 TW_MAX_BRIGHTNESS := 1023
 TW_DEFAULT_BRIGHTNESS := 400
-# ИСПРАВЛЕНО: Уменьшено смещение, чтобы подтянуть интерфейс выше к капле
 TW_Y_OFFSET := 55
 TW_HAPTICS_TSPDRV := true
 TW_HAS_MTP := true
@@ -88,7 +87,7 @@ TW_INCLUDE_FASTBOOTD := true
 # Repack tools
 TW_INCLUDE_REPACKTOOLS := true
 
-# Encryption (Настройки под FBE v2 и зашифрованную Метадату из fstab.default)
+# Encryption 
 TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
 TW_INCLUDE_FBE_METADATA_DECRYPT := true
