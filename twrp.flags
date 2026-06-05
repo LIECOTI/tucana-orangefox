@@ -2,4 +2,4 @@
 /vendor         ext4    /dev/block/mapper/vendor        flags=display="Vendor";backup=0;logical
 /cust           ext4    /dev/block/mapper/cust          flags=display="Cust";backup=1;wipeui
 
-/usb_otg        vfat    /dev/block/sdg1      /dev/block/sdg     flags=display="USB-OTG";storage;wipeui;removable
+/usb_otg      auto    /dev/block/sdg1      /dev/block/sdg     flags=display="USB-OTG";storage;wipeui;removable
