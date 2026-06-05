@@ -13,6 +13,5 @@ cust                                            /cust        ext4    ro,barrier=
 /dev/block/bootdevice/by-name/misc              /misc        emmc    defaults                 defaults
 /dev/block/bootdevice/by-name/dtbo              /dtbo        emmc    defaults                 defaults
 
-# Userdata with FBE v2 encryption
+# Userdata
 /dev/block/bootdevice/by-name/userdata          /data        f2fs    nosuid,nodev,noatime     wait,check,formattable,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized+wrappedkey_v0,metadata_encryption=aes-256-xts:wrappedkey_v0,keydirectory=/metadata/vold/metadata_encryption
-
