@@ -2,7 +2,7 @@
 export FOX_BUILD_DEVICE="tucana"
 
 # Versioning and Maintainer
-export FOX_VARIANT="Retrofit"
+export FOX_VARIANT="default"
 export FOX_MAINTAINER_PATCH_VERSION="1"
 export OF_MAINTAINER="LIECOTI"
 
