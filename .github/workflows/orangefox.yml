@@ -34,7 +34,7 @@ jobs:
     - name: Clone device tree and download DTBO
       run: |
         cd ~/fox_12.1
-        git clone https://github.com/LIECOTI/tucana-orangefox.git -b main device/xiaomi/tucana
+        git clone https://github.com/LIECOTI/tucana-orangefox.git -b not_retrofit device/xiaomi/tucana
         cd device/xiaomi/tucana
         curl -L -o dtbo.img "https://mirrors.dotsrc.org/lineageos/full/tucana/20260601/dtbo.img"
   
@@ -54,5 +54,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: OrangeFox-Tucana-Retrofit
+        name: OrangeFox-Tucana-NOT-Retrofit
         path: ~/fox_12.1/out/target/product/tucana/OrangeFox*.zip
