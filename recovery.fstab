@@ -1,18 +1,11 @@
-# <src>                                         <mnt_point>    <type>  <mnt_flags and options>  <fs_mgr_flags>
+# mount_point  fstype  device                                   fs_mgr_flags
 
-# Logical partitions (Retrofit Android 16)
-system                                          /system        ext4    ro,barrier=1,discard     wait,logical
-system_ext                                      /system_ext    ext4    ro,barrier=1,discard     wait,logical
-product                                         /product       ext4    ro,barrier=1,discard     wait,logical
-vendor                                          /vendor        ext4    ro,barrier=1,discard     wait,logical
-
-# Physical partitions
-/dev/block/bootdevice/by-name/boot              /boot          emmc    defaults                 defaults
-/dev/block/bootdevice/by-name/recovery          /recovery      emmc    defaults                 defaults
-/dev/block/bootdevice/by-name/cache             /cache         ext4    nosuid,nodev,noatime     wait,formattable,check
-/dev/block/bootdevice/by-name/metadata          /metadata      ext4    nosuid,nodev,noatime     wait,formattable,first_stage_mount
-/dev/block/bootdevice/by-name/misc              /misc          emmc    defaults                 defaults
-/dev/block/bootdevice/by-name/dtbo              /dtbo          emmc    defaults                 defaults
-
-# Userdata
-/dev/block/bootdevice/by-name/userdata          /data          f2fs    nosuid,nodev,noatime     wait,check,formattable,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized+wrappedkey_v0,metadata_encryption=aes-256-xts:wrappedkey_v0,keydirectory=/metadata/vold/metadata_encryption
+/boot          emmc    /dev/block/bootdevice/by-name/boot       defaults
+/dtbo          emmc    /dev/block/bootdevice/by-name/dtbo       defaults
+/cache         ext4    /dev/block/bootdevice/by-name/cache      defaults
+/recovery      emmc    /dev/block/bootdevice/by-name/recovery   defaults
+/system_root   ext4    /dev/block/bootdevice/by-name/system     defaults
+/vendor        ext4    /dev/block/bootdevice/by-name/vendor     defaults
+/data          f2fs    /dev/block/bootdevice/by-name/userdata   defaults
+/cust          ext4    /dev/block/bootdevice/by-name/cust       defaults
+/misc          emmc    /dev/block/bootdevice/by-name/misc       defaults
