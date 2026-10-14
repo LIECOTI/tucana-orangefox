@@ -36,7 +36,7 @@ jobs:
         cd ~/fox_12.1
         git clone https://github.com/LIECOTI/tucana-orangefox.git -b main device/xiaomi/tucana
         cd device/xiaomi/tucana
-        curl -L -o dtbo.img "https://mirrors.dotsrc.org/lineageos/full/tucana/20260601/dtbo.img"
+        curl -fL -o dtbo.img "https://mirrorbits.lineageos.org/full/tucana/20261005/dtbo.img"
   
     - name: Build OrangeFox
       run: |
@@ -55,4 +55,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: OrangeFox-Tucana-Retrofit
-        path: ~/fox_12.1/out/target/product/tucana/OrangeFox*.zip
+        path: |
+          ~/fox_12.1/out/target/product/tucana/OrangeFox*.zip
+          ~/fox_12.1/out/target/product/tucana/OrangeFox*.img
