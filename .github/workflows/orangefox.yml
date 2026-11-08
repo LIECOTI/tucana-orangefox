@@ -1,0 +1,75 @@
+name: Build OrangeFox R12 Tucana
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Recovery
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Clean disk space
+      uses: rokibhasansagar/slimhub_actions@main
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git-core gnupg flex bison build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python2
+        sudo ln -sf /usr/bin/python2 /usr/bin/python
+        
+        sudo curl https://storage.googleapis.com/git-repo-downloads/repo -o /usr/local/bin/repo
+        sudo chmod a+x /usr/local/bin/repo
+        
+        git config --global user.name "LIECOTI"
+        git config --global user.email "liecoti@github.com"
+
+    - name: Sync OrangeFox sources
+      run: |
+        mkdir ~/OrangeFox_sync
+        cd ~/OrangeFox_sync
+        git clone https://gitlab.com/OrangeFox/sync.git
+        cd sync
+        ./orangefox_sync.sh --branch 12.1 --path ~/fox_12.1
+
+    - name: Clone device tree
+      run: |
+        cd ~/fox_12.1
+        git clone https://github.com/LIECOTI/tucana-orangefox.git -b main device/xiaomi/tucana
+  
+    - name: Download DTBO image
+      run: |
+        cd ~/fox_12.1/device/xiaomi/tucana
+        curl -fL -o dtbo.img "https://lineageos.tetaneutral.net/full/tucana/20261102/dtbo.img"
+        ls -lh dtbo.img
+
+    - name: Apply recovery patch
+      run: |
+        cd ~/fox_12.1/bootable/recovery
+        git apply ../../device/xiaomi/tucana/recovery-patches/bootable_recovery.diff
+
+    - name: Build OrangeFox
+      run: |
+        cd ~/fox_12.1
+        set -x
+        set +e
+        export ALLOW_MISSING_DEPENDENCIES=true
+        export LC_ALL="C"
+        
+        source build/envsetup.sh
+        export TARGET_PRODUCT=twrp_tucana
+        source device/xiaomi/tucana/vendorsetup.sh
+        lunch twrp_tucana-eng
+        mka adbd libminuitwrp mount.ntfs fsck.ntfs mkfs.ntfs libntfs-3g libfuse-lite
+        
+        P=out/target/product/tucana
+        cp $P/system/lib64/{libminuitwrp,libntfs-3g,libfuse-lite}.so $P/recovery/root/system/lib64/
+        cp $P/system/bin/{mount,fsck,mkfs}.ntfs $P/recovery/root/system/bin/
+        rm -f $P/recovery.img $P/ramdisk-recovery.img $P/ramdisk-recovery.cpio
+        
+        mka recoveryimage
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: OrangeFox-Tucana-Retrofit
+        path: ~/fox_12.1/out/target/product/tucana/OrangeFox*.zip

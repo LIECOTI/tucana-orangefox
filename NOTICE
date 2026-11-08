@@ -1,0 +1,15 @@
+tucana-orangefox
+Copyright 2025-2026 LIECOTI
+
+This project contains code under multiple licenses:
+
+1. Device Tree Configuration & Makefiles:
+   Licensed under the Apache License, Version 2.0.
+   See LICENSE file for details.
+
+2. OrangeFox / TWRP Source Patches (recovery-patches/):
+   Licensed under the GNU General Public License, Version 3 or later (GPL-3.0-or-later).
+   See recovery-patches/COPYING for details.
+
+3. Proprietary Qualcomm & Xiaomi Vendor Binaries (recovery/root/):
+   All rights reserved by Qualcomm and Xiaomi.

@@ -1,0 +1,12 @@
+import /init.recovery.qcom_decrypt.rc
+
+on fs
+    wait /dev/block/platform/soc/1d84000.ufshc
+    symlink /dev/block/platform/soc/1d84000.ufshc /dev/block/bootdevice
+
+on init
+    setprop prepdecrypt.setpatch true
+    setprop sys.usb.controller a600000.dwc3
+    setprop sys.usb.configfs 1
+    mkdir /tmp/misc 0700 root root
+    mkdir /tmp/misc/keystore 0700 root root

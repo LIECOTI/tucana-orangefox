@@ -1,0 +1,273 @@
+diff --git a/data.cpp b/data.cpp
+index 25b883e7..68563168 100755
+--- a/data.cpp
++++ b/data.cpp
+@@ -808,8 +808,10 @@ void DataManager::SetDefaultValues()
+   mConst.SetValue(OF_STATUS_PLACEMENT_S, of_status_placement);
+   mConst.SetValue(OF_CENTER_Y_S, of_center_y);
+   
+-  mConst.SetValue(OF_SCREEN_H_S, OF_SCREEN_H);
+-  mData.SetValue(OF_SCREEN_NAV_H_S, OF_SCREEN_H); // mData for nide navbar function
++  int of_screen_h = atoi(OF_SCREEN_H) - OF_SCREEN_BOTTOM_INSET;
++  mConst.SetValue("screen_full_h", OF_SCREEN_H); // panel height, used for theme scaling
++  mConst.SetValue(OF_SCREEN_H_S, of_screen_h);
++  mData.SetValue(OF_SCREEN_NAV_H_S, of_screen_h); // mData for nide navbar function
+   
+   mConst.SetValue(OF_STATUS_H_S, OF_STATUS_H);
+   mConst.SetValue(OF_HIDE_NOTCH_S, OF_HIDE_NOTCH);
+diff --git a/gui/nanosvg.cpp b/gui/nanosvg.cpp
+index 8d0206d6..24aceb29 100644
+--- a/gui/nanosvg.cpp
++++ b/gui/nanosvg.cpp
+@@ -71,6 +71,14 @@ int res_create_svg_surface(const char* name, float scale, gr_surface* pSurface)
+ 
+ 	nsvgRasterize(rast, image, 0, 0, scale, (unsigned char*)img, w, h, w*4);
+ 
++	// nanosvg writes RGBA bytes; match the byte order the rest of the UI draws in
++	if (res_swap_red_blue()) {
++		for (int i = 0; i < w * h; i++) {
++			uint32_t p = img[i];
++			img[i] = (p & 0xFF00FF00) | ((p & 0xFF) << 16) | ((p >> 16) & 0xFF);
++		}
++	}
++
+ 	GGLSurface *surface;
+ 	surface = (GGLSurface *)malloc(sizeof(GGLSurface));
+ 	memset(surface, 0, sizeof(GGLSurface));
+diff --git a/gui/objects.hpp b/gui/objects.hpp
+index bdf35bd6..bffbb9d0 100644
+--- a/gui/objects.hpp
++++ b/gui/objects.hpp
+@@ -1380,6 +1380,7 @@ public:
+ 	virtual int NotifyTouch(TOUCH_STATE state, int x, int y);
+ 	virtual int NotifyVarChange(const std::string& varName, const std::string& value);
+ 	virtual int SetRenderPos(int x, int y, int w = 0, int h = 0);
++	virtual int IsInRegion(int x, int y);
+ 	virtual std::string GetObjectType() const { return "GUIPatternPassword"; }
+ 	bool MoveSelectionNext();
+ 	bool MoveSelectionPrevious();
+diff --git a/gui/pages.cpp b/gui/pages.cpp
+index b1825757..42e22938 100755
+--- a/gui/pages.cpp
++++ b/gui/pages.cpp
+@@ -935,7 +935,7 @@ int PageSet::LoadDetails(LoadingContext& ctx, xml_node<>* root)
+ 				xml_attribute<>* height_res_attr = resolution->first_attribute("height");
+ 				height = atoi(height_res_attr->value());
+ 			} else {
+-				DataManager::GetValue("screen_original_h", height);
++				DataManager::GetValue("screen_full_h", height);
+ 			}
+ 			xml_attribute<>* noscale_attr = resolution->first_attribute("noscaling");
+ 			if (width_attr && !noscale_attr) {
+diff --git a/gui/patternpassword.cpp b/gui/patternpassword.cpp
+index ba8e43ae..729e227b 100755
+--- a/gui/patternpassword.cpp
++++ b/gui/patternpassword.cpp
+@@ -275,6 +275,15 @@ static bool IsInCircle(int x, int y, int ox, int oy, int r)
+ 	return pow(x - ox, 2) + pow(y - oy, 2) <= pow(r, 2);
+ }
+ 
++// Dot hit circles (radius 3r around the dot centre) reach 2r past the
++// placement box, so corner dots were only partly touchable.
++int GUIPatternPassword::IsInRegion(int x, int y)
++{
++	if (ActionObject::IsInRegion(x, y))
++		return 1;
++	return InDot(x, y) != -1 ? 1 : 0;
++}
++
+ int GUIPatternPassword::InDot(int x, int y)
+ {
+ 	for (size_t i = 0; i < mGridSize * mGridSize; ++i) {
+diff --git a/gui/resources.cpp b/gui/resources.cpp
+index 127f7416..dca305bc 100755
+--- a/gui/resources.cpp
++++ b/gui/resources.cpp
+@@ -253,6 +253,11 @@ ImageResource::ImageResource(xml_node<>* node, ZipArchiveHandle pZip)
+ 	COLOR color = LoadAttrColor(node, "tint", &found_color_attr);
+ 
+ 	if (found_color_attr && temp_surface) {
++		if (res_swap_red_blue()) {
++			const auto r = color.red;
++			color.red = color.blue;
++			color.blue = r;
++		}
+ 		GGLSurface *surface = (GGLSurface*)temp_surface;
+ 		int size = surface->width * surface->height;
+ 		uint32_t *data = (uint32_t *)surface->data;
+@@ -281,6 +286,13 @@ uint32_t* createShape(int w, int h, int radius, int stroke, COLOR color, Rounded
+     if (!data) return nullptr; // Handle allocation failure
+     memset(data, 0, malloc_size);
+ 
++    // the pixels below are packed as RGBA; match the byte order the UI draws in
++    if (res_swap_red_blue()) {
++        const auto r = color.red;
++        color.red = color.blue;
++        color.blue = r;
++    }
++
+     const uint32_t px = (color.alpha << 24) | (color.blue << 16) | (color.green << 8) | color.red;
+ 
+     // --- Simplification for non-rounded, filled rectangle ---
+diff --git a/gui/theme/portrait_hdpi/pages/templates/templates.xml b/gui/theme/portrait_hdpi/pages/templates/templates.xml
+index 9dd03df7..5e13a931 100644
+--- a/gui/theme/portrait_hdpi/pages/templates/templates.xml
++++ b/gui/theme/portrait_hdpi/pages/templates/templates.xml
+@@ -853,6 +853,14 @@
+ 				<action function="set">of_show_pass=1</action>
+ 			</button>
+ 
++			<!-- The eye icon is 64x46 px; this gives it a fingertip-sized touch area -->
++			<button>
++				<condition var1="of_show_pass" var2="0"/>
++				<fill color="%transparent%"/>
++				<placement x="%pass_show_touch_x%" y="%pass_show_touch_y%" w="144" h="144"/>
++				<action function="set">of_show_pass=1</action>
++			</button>
++
+ 			<fill color="%accent%">
+ 				<condition var1="tw_password_fail" op="!=" var2="1"/>
+ 				<placement x="%col1_x_caption%" y="%row3_2a_y%" w="%input_backup_w%" h="%input_line_height%" placement="1"/>
+diff --git a/gui/theme/portrait_hdpi/resources/vars.xml b/gui/theme/portrait_hdpi/resources/vars.xml
+index 7dcffc29..49b432f7 100644
+--- a/gui/theme/portrait_hdpi/resources/vars.xml
++++ b/gui/theme/portrait_hdpi/resources/vars.xml
+@@ -608,6 +608,8 @@
+ 		<variable name="row3_1a_y" value="690+%cutout_w%"/>
+ 		<variable name="row3_2_y" value="720+%cutout_w%"/>
+ 		<variable name="row3_2a_y" value="750+%cutout_w%"/>
++		<variable name="pass_show_touch_x" value="%ab_btn1_x%-72"/>
++		<variable name="pass_show_touch_y" value="%row3_2_y%-72"/>
+ 		<variable name="row3_3_y" value="780+%cutout_w%"/>
+ 		<variable name="row3_3a_y" value="810+%cutout_w%"/>
+ 		<variable name="row4_1_y" value="840+%cutout_w%"/>
+diff --git a/gui/theme/portrait_hdpi/themes/navbar.xml b/gui/theme/portrait_hdpi/themes/navbar.xml
+index bd964771..1d101faf 100644
+--- a/gui/theme/portrait_hdpi/themes/navbar.xml
++++ b/gui/theme/portrait_hdpi/themes/navbar.xml
+@@ -2,8 +2,8 @@
+ <recovery>
+ 	<variables>
+ 		<variable name="navbar_disable" value="1"/>
+-		<variable name="navbar_disable_add" value="96"/>
+-		<variable name="screen_h" value="%screen_original_h%+96"/>
+-		<variable name="real_gestures_enable" value="1"/>
++		<variable name="navbar_disable_add" value="0"/>
++		<variable name="screen_h" value="%screen_original_h%"/>
++		<variable name="real_gestures_enable" value="0"/>
+ 	</variables>
+ </recovery>
+\ No newline at end of file
+diff --git a/minuitwrp/include/minuitwrp/minui.h b/minuitwrp/include/minuitwrp/minui.h
+index 5dbbf726..c46bb204 100644
+--- a/minuitwrp/include/minuitwrp/minui.h
++++ b/minuitwrp/include/minuitwrp/minui.h
+@@ -100,6 +100,9 @@ int ev_has_mouse(void);
+ // Returns 0 if no error, else negative.
+ int res_create_surface(const char* name, gr_surface* pSurface);
+ int res_get_pixel_format(void);
++// 1 when this build draws with red and blue swapped (RECOVERY_ABGR). Code that
++// writes RGBA pixels itself (SVG raster, tint, shapes) has to swap them too.
++int res_swap_red_blue(void);
+ void res_free_surface(gr_surface surface);
+ int res_scale_surface(gr_surface source, gr_surface* destination, float scale_w, float scale_h);
+ 
+diff --git a/minuitwrp/resources.cpp b/minuitwrp/resources.cpp
+index 2db6536d..52025913 100644
+--- a/minuitwrp/resources.cpp
++++ b/minuitwrp/resources.cpp
+@@ -465,3 +465,13 @@ int res_get_pixel_format(void) {
+ #endif
+     return GGL_PIXEL_FORMAT_BGRA_8888;
+ }
++
++// With RECOVERY_ABGR, gr_color() and the PNG loader (png_set_bgr) put blue in the
++// first byte of each pixel, and the framebuffer is filled in that order.
++int res_swap_red_blue(void) {
++#if defined(RECOVERY_ABGR)
++    return 1;
++#else
++    return 0;
++#endif
++}
+diff --git a/orangefox.mk b/orangefox.mk
+index d1e5046f..2d0a4fbe 100644
+--- a/orangefox.mk
++++ b/orangefox.mk
+@@ -237,6 +237,14 @@ else
+     LOCAL_CFLAGS += -DOF_SCREEN_H='"1920"'
+ endif
+ 
++# Space in pixels kept free at the bottom of the screen (curved or rounded bottom edge).
++# The theme places its bottom elements this much higher; scaling still uses OF_SCREEN_H.
++ifneq ($(OF_SCREEN_BOTTOM_INSET),)
++    LOCAL_CFLAGS += -DOF_SCREEN_BOTTOM_INSET=$(OF_SCREEN_BOTTOM_INSET)
++else
++    LOCAL_CFLAGS += -DOF_SCREEN_BOTTOM_INSET=0
++endif
++
+ ifneq ($(OF_STATUS_H),)
+     LOCAL_CFLAGS += -DOF_STATUS_H='"$(OF_STATUS_H)"'
+ else
+diff --git a/partitionmanager.cpp b/partitionmanager.cpp
+index b52a7d49..dc8a7895 100755
+--- a/partitionmanager.cpp
++++ b/partitionmanager.cpp
+@@ -36,6 +36,8 @@
+ #include <zlib.h>
+ #include <iostream>
+ #include <iomanip>
++#include <fstream>
++#include <sstream>
+ #include <sys/wait.h>
+ #include <linux/fs.h>
+ #include <sys/mount.h>
+@@ -507,6 +509,28 @@ clear:
+ 		if (TWFunc::Find_Fstab(Fstab_Filename)) {
+ 			LOGINFO("Fstab: %s\n", Fstab_Filename.c_str());
+ 			TWFunc::copy_file(Fstab_Filename, additional_fstab, 0600, false);
++			{
++				std::ifstream in(additional_fstab);
++				std::stringstream ss;
++				ss << in.rdbuf();
++				in.close();
++				std::string fc = ss.str();
++				const std::string from = "/dev/block/bootdevice/by-name/";
++				const std::string to = "/dev/block/by-name/";
++				size_t fp = 0;
++				bool changed = false;
++				while ((fp = fc.find(from, fp)) != std::string::npos) {
++					fc.replace(fp, from.length(), to);
++					fp += to.length();
++					changed = true;
++				}
++				if (changed) {
++					std::ofstream out(additional_fstab);
++					out << fc;
++					out.close();
++					LOGINFO("Rewrote bootdevice paths in additional fstab\n");
++				}
++			}
+ 			Fstab_Filename = additional_fstab;
+ 			property_set("fstab.additional", "1");
+ 			goto parse;
+@@ -680,6 +704,19 @@ void TWPartitionManager::Decrypt_Data() {
+ 				Mount_By_Path(Decrypt_Data->Key_Directory, false);
+ 		if (!Decrypt_Data->Key_Directory.empty()) {
+ 			Set_Crypto_Type("file");
++			{
++				TWFunc::Exec_Cmd("mkdir -p /mnt/vendor/persist /vendor/firmware_mnt");
++				TWFunc::Exec_Cmd("mount -t ext4 -o ro /dev/block/by-name/persist /mnt/vendor/persist");
++				{
++				char slot_suffix[PROPERTY_VALUE_MAX];
++				std::string modem_dev = "/dev/block/by-name/modem";
++				property_get("ro.boot.slot_suffix", slot_suffix, "");
++				if (!TWFunc::Path_Exists(modem_dev))
++					modem_dev += slot_suffix;
++				if (TWFunc::Path_Exists(modem_dev) && !TWFunc::Path_Exists("/vendor/firmware_mnt/image"))
++					TWFunc::Exec_Cmd("mount -t vfat -o ro " + modem_dev + " /vendor/firmware_mnt");
++			}
++			}
+ #ifdef TW_INCLUDE_FBE_METADATA_DECRYPT
+ #ifdef USE_FSCRYPT
+ 			if (android::vold::fscrypt_mount_metadata_encrypted(Decrypt_Data->Actual_Block_Device, Decrypt_Data->Mount_Point, false, false, Decrypt_Data->Current_File_System, TWFunc::Path_Exists(additional_fstab) ? additional_fstab : "")) {

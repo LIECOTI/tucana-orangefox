@@ -1,0 +1,7 @@
+bootable_recovery.diff
+repository: https://gitlab.com/OrangeFox/bootable/Recovery.git
+commit:     cbcc4f713dbef98d76d6d2cfd019b1ebfd9418e9
+date:       Sun Sep 20 16:19:29 2026 +0100
+subject:    Turn warning into error
+branch:     fox_12.1
+path:       bootable/recovery
